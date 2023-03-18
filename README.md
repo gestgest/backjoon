@@ -5,6 +5,7 @@ This is a auto push repository for Baekjoon Online Judge created with [BaekjoonH
 
 수학
 - https://www.acmicpc.net/problem/25179
+- https://www.acmicpc.net/problem/11401
 
 정수론
 - https://www.acmicpc.net/problem/2981 -> 혹시 모르니
