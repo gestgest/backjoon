@@ -18,3 +18,7 @@ This is a auto push repository for Baekjoon Online Judge created with [BaekjoonH
 
 누적합
 - https://www.acmicpc.net/problem/10986
+
+
+이분탐색
+- https://www.acmicpc.net/problem/1654
