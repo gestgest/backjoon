@@ -2,54 +2,59 @@
 #include <vector>
 #include <algorithm>
 
+#define INF 2147483647
+
 using namespace std;
+vector<int> house;
+int n, c;
 
-//dis는 간격
-//리턴 값은 -1은 안됨 [dis값이 크다.] =>  나머지 값은 딱 됨
-int indexSearch(vector<int>& house, int dis, int c, int max)
+//1 2 4 8 9
+//1 => 2 (1) => 9
+//1 => 4 (3) => 9
+//1 => 8 (7) => 9 (1)
+
+//길이 찾기 => 탐색한 길이로 직접 실행해본다 => 되면 그 값 리턴 안되면 -1.
+int search_dis(int dis)
 {
-	int sum = house[0];
-	int i;
-	int count = 1;
-	sum += dis;
-
-	for (i = 1; i < house.size(); i++)
-	{
-		//간소화[★]
+	int count = 0;
+	int sum = 0; //sum + dis
+	for(int i = 0; i < n; i++)
+	{ 
+		//만약 dis값이 
 		if (sum <= house[i])
 		{
-			sum = house[i];
-			sum += dis;
+			sum = house[i] + dis;
 			count++;
 		}
+		if (c == count) {
+			return dis;
+		}
 	}
-	//
-	if (count < c)
+
+	if (count < c) {
 		return -1;
+	}
+
 	return dis;
 }
 
 
-int wife_binary_search(vector<int>& house, int start, int end, const int max, const int c)
+//이분탐색 => 이분탐색할 것은 길이.
+int binary_search_dis(int start, int end)
 {
-	//이것을 맨 앞에 넣었어야 함[★]
-	//이런 배열탐색전 조건문은 맨 앞에
-	if (end < start) {
-		return 0;
+	if (start > end) {
+		return -1;
 	}
 	int mid = (start + end) / 2;
-	int jud = indexSearch(house, mid, c, max);
+	int num = search_dis(mid);//길이 찾기
 
-
-	// dis값이 큰 경우
-	if (jud == -1) {
-		return wife_binary_search(house, start, mid - 1, max, c);
+	//이분탐색 => dis값이 너무 크다
+	if (num == -1) {
+		return binary_search_dis(start, mid - 1);
 	}
 	else {
-		int num = wife_binary_search(house, mid + 1, end, max, c);
-		return (num > jud) ? num : jud;
+		return max(binary_search_dis(mid + 1, end), num);
 	}
-
 }
 
 int main()
@@ -57,25 +62,17 @@ int main()
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
-	vector<int> house = vector<int>();
-	int n, c, num;
-
 	cin >> n >> c;
+	house = vector<int>(n);
+
 	for (int i = 0; i < n; i++)
 	{
-		cin >> num;
-		house.push_back(num);
+		cin >> house[i];
 	}
 	sort(house.begin(), house.end());
+	int num = (house[n - 1] - house[0]) / (c - 1); //이것보다 큰 거리 값은 나올 수 없음
 
-	int min = house[0];
-	int max = house[n - 1];
-	num = (max - min) / (c - 1); //이 값을 넘을 수 없음 [기존의 탑]
+	cout << binary_search_dis(1, num) << '\n';
 
-
-	//간격으로 이분탐색하는게 포인트
-	//1 ~ num값의 이진탐색
-	cout << wife_binary_search(house, 1, num, max, c) << '\n';
-	//1~num
+	//이분탐색급으로 나눈다 => 
 }
-
