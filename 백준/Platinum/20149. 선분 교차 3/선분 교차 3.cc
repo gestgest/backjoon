@@ -84,8 +84,8 @@ void crossDot(Point p[POINT_SIZE])
 	if (d == 0) // 평행할 때
 	{
 		// 교점이 하나일 때
-		if (p[1] == p[2] && p[2] > p[0]) cout << p[1].x << " " << p[1].y << '\n';
-		else if (p[0] == p[3] && p[0] > p[2]) cout << p[0].x << " " << p[0].y << '\n';
+		if (p[1] == p[2]) cout << p[1].x << " " << p[1].y << '\n';
+		else if (p[0] == p[3]) cout << p[0].x << " " << p[0].y << '\n';
 	}
 	else // 교차할 때
 	{
