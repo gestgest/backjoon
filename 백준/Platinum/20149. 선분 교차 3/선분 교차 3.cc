@@ -96,13 +96,6 @@ void crossDot(Point p[POINT_SIZE])
 		cout.precision(9);
 		cout << x << " " << y;
 	}
-
-
-	/*
-		double dx = (points[0].y * points[1].x - points[0].x * points[3].x - points[2].x - (points[1].y - points[0].y * points[3].x - points[2].x) * points[0].x) - (points[2].y * points[1].x - points[0].x * points[3].x - points[2].x - (points[3].y - points[2].y * points[1].x - points[0].x) * points[2].x);
-		double d = (points[3].y - points[2].y * points[1].x - points[0].x - points[1].y - points[0].y * points[3].x - points[2].x);
-		double dy = points[1].y - points[0].y * dx + (points[0].y * points[1].x - points[0].x - (points[1].y - points[0].y) * points[0].x) * d;
-	*/
 }
 
 int main()
