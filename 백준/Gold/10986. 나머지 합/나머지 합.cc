@@ -1,6 +1,7 @@
 #include <iostream>
-#include <map>
-#include <iterator>
+#include <vector>
+#include <algorithm>
+
 using namespace std;
 
 int main()
@@ -8,45 +9,31 @@ int main()
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
-	int n, m;
-	int num;
-	long sum = 0;
+	int n, m, num;
+	long long count = 0;
+	long long sum = 0;
 
 	cin >> n >> m;
-	int* s = new int[n];
-	map<long, long> other_map;
-	
-	cin >> num;
-	num %= m;
-	s[0] = num;
-	other_map.insert(pair<int, int>(num, 1));
+	//s[m]; => %값 넣기
 
-	for (int i = 1; i < n; i++)
+	vector<long long> v = vector<long long>(m, 0);
+
+	for (int i = 0; i < n; i++)
 	{
 		cin >> num;
+		sum += num;
 
-		num %= m;
-		s[i] = (s[i - 1] + num) % m;
-
-		if (other_map.count(s[i])) {
-			other_map[s[i]]++;
-		}
-		else {
-			other_map.insert(pair<int,int>(s[i], 1));
-		}
+		v[sum % m]++;
 	}
+	
+	//오버플로우?
+	count += (v[0] + 1) * (v[0]) / 2;
 
-	map<long, long>::iterator it;
-	for (it = other_map.begin(); it != other_map.end(); it++)
+	for (int i = 1; i < m; i++)
 	{
-		if (it->first == 0) {
-			sum += it->second;
-		}
-		sum += (it->second) * (it->second - 1) / 2;
+		count += (v[i] - 1) * (v[i]) / 2;
 	}
 
-	cout << sum << '\n';
-
+	cout << count << '\n';
+	
 }
-
-//time over
