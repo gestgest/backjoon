@@ -8,18 +8,21 @@
 using namespace std;
 typedef long long ll;
 ll n, k;
-string s_tmps[20];
-int cache[55];
-int value_string[55];
+string s_tmps[15];
+int cache[MAX_STRING_SIZE];
+int value_string[15];
 // 사용한 원소를 비트마스킹
 // 나머지에 대해 저장
-ll dp[1 << 16][100];
+ll dp[1 << 15][100];
+
+
+
 // 최대 공약수(기약분수로 만들기 위함)
 ll GCD(ll a, ll b) {
     return b ? GCD(b, a % b) : a;
 }
 
-//문자열을 나머지 값으로
+//맞음
 long long stringToValue(string s)
 {
     long long sum = 0;
@@ -32,6 +35,7 @@ long long stringToValue(string s)
     return sum;
 }
 
+//맞음
 long long dp_park(int value, int status)
 {
     //long long num = stringToValue(s);
@@ -69,6 +73,7 @@ long long dp_park(int value, int status)
 
     return dp[status][value];
 }
+
 int main() {
     ios::sync_with_stdio(0);
     cin.tie(0);
