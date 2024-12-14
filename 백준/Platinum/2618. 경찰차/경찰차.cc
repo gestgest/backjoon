@@ -1,90 +1,104 @@
 #include <iostream>
 #include <vector>
-#include <cmath>
 #include <algorithm>
 
 using namespace std;
 
-int n, k;
-int dp[1001][1001] = {0};
-int input[1001][2];
+class Point {
+public:
+	int x;
+	int y;
+	Point(int x, int y) {
+		this->x = x;
+		this->y = y;
+	}
+};
 
-int cal_dis(int x1, int y1, int x2, int y2)
+//dp는 [경찰차1_k_index][경찰차2_k_index]
+int dp[1001][1001];
+
+int n, w;
+vector<Point> points;
+vector<int> index_result;
+
+int cal_dis(int old_x, int old_y, int new_x, int new_y)
 {
-	return abs(x2 - x1) + abs(y2 - y1);
+	int x = abs(new_x - old_x);
+	int y = abs(new_y - old_y);
+	return x + y;
 }
 
-int max_value(int a, int b)
+int dp_buttom_up(int index1, int index2)
 {
-	return a > b ? a : b;
-}
-int min_value(int a, int b)
-{
-	return a < b ? a : b;
-}
-
-//in1은 0,0 경찰차의 마지막 input 인덱스, in2는 k,k 경찰차의 마지막 input 인덱스
-//in1 => [0], in2 => [1]
-int cal_dp(int in1, int in2) 
-{
-	int dis[2];
-
-	//완료
-	if (in1 == k || in2 == k)
+	//다 했다면
+	if (index1 == w || index2 == w)
+	{
 		return 0;
+	}
 
-	if (dp[in2][in1] != 0)
-		return dp[in2][in1];
+	if (dp[index1][index2] != -1)
+		return dp[index1][index2];
 
-	int next = max_value(in1, in2) + 1;
-	if (in1 == 0) {
-		dis[0] = cal_dis(input[next][0], input[next][1], 1, 1); //0, 0에서 x,y
+	dp[index1][index2] = 0;
+
+	int next = max(index1, index2) + 1; //다음 사건
+	int dis[2];
+
+	if (index1 == 0) { //(1,1)
+		dis[0] = cal_dis(1, 1, points[next].x, points[next].y);
 	}
 	else {
-		dis[0] = cal_dis(input[next][0], input[next][1], input[in1][0], input[in1][1]); //전 포지션에서 x,y
+		dis[0] = cal_dis(points[index1].x, points[index1].y, points[next].x, points[next].y);
 	}
 
-	if (in2 == 0) {
-		dis[1] = cal_dis(input[next][0], input[next][1], n, n); //n,n에서 x,y
+	if (index2 == 0) { //(n,n)
+		dis[1] = cal_dis(n, n, points[next].x, points[next].y);
 	}
 	else {
-		dis[1] = cal_dis(input[next][0], input[next][1], input[in2][0], input[in2][1]); //전 포지션에서 x,y
+		dis[1] = cal_dis(points[index2].x, points[index2].y, points[next].x, points[next].y);
 	}
-	
-	dp[in2][in1] = min_value(cal_dp(next, in2) + dis[0], cal_dp(in1, next) + dis[1]);
 
-	return dp[in2][in1];
+	//min
+	dp[index1][index2] = min(dp_buttom_up(next, index2) + dis[0], dp_buttom_up(index1, next) + dis[1]);
+	return dp[index1][index2];
 }
 
-void search_dp(int in1, int in2)
+
+//역추적
+void back_tracking(int index1, int index2)
 {
-	int dis[2];
-	if (in1 == k || in2 == k) {
+
+	//다 했다면
+	if (index1 == w || index2 == w)
+	{
 		return;
 	}
 
-	int next = max_value(in1, in2) + 1;
-	if (in1 == 0) {
-		dis[0] = cal_dis(input[next][0], input[next][1], 1, 1); //0, 0에서 x,y
+	int next = max(index1, index2) + 1; //다음 사건
+	int dis[2];
+
+	if (index1 == 0) { //(1,1)
+		dis[0] = cal_dis(1, 1, points[next].x, points[next].y);
 	}
 	else {
-		dis[0] = cal_dis(input[next][0], input[next][1], input[in1][0], input[in1][1]); //전 포지션에서 x,y
+		dis[0] = cal_dis(points[index1].x, points[index1].y, points[next].x, points[next].y);
 	}
 
-	if (in2 == 0) {
-		dis[1] = cal_dis(input[next][0], input[next][1], n, n); //n,n에서 x,y
+	if (index2 == 0) { //(n,n)
+		dis[1] = cal_dis(n, n, points[next].x, points[next].y);
 	}
 	else {
-		dis[1] = cal_dis(input[next][0], input[next][1], input[in2][0], input[in2][1]); //전 포지션에서 x,y
+		dis[1] = cal_dis(points[index2].x, points[index2].y, points[next].x, points[next].y);
 	}
-
-	if (dp[in2][next] + dis[0] < dp[next][in1] + dis[1]) {
-		cout << "1" << '\n';
-		search_dp(next, in2);
+	
+	if (dp[next][index2] + dis[0] < dp[index1][next] + dis[1])
+	{
+		cout << 1 << '\n';
+		back_tracking(next, index2);
 	}
 	else {
-		cout << "2" << '\n';
-		search_dp(in1, next);
+		cout << 2 << '\n';
+		back_tracking(index1, next);
 	}
 }
 
@@ -93,26 +107,30 @@ int main()
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
-	cin >> n >> k;
-	for (int i = 1; i <= k; i++)
-	{
-		cin >> input[i][0] >> input[i][1];
-	}
+	//경찰차 하나는 (1,1) 하나는 (n,n)
+	int y, x;
+	cin >> n >> w;
 
-	//최대치로 한번
-	cout << cal_dp(0, 0) <<'\n';
-	search_dp(0, 0);
-
-	//디버그
-	/*
-	for (int i = 0; i < k; i++)
+	//나중에 -1, 0으로 들어갔는지 아닌지 확인용도
+	for (int i = 0; i < w; i++)
 	{
-		for(int j = 0; j < k; j++)
-		{ 
-			cout << dp[i][j] << ' ';
+		for (int j = 0; j < w; j++)
+		{
+			dp[i][j] = -1;
 		}
-		cout << '\n';
 	}
-	*/
+
+	points.push_back(Point(0, 0)); //간편한 계산을 위해 [0]은 쓰레기값
+	for (int i = 0; i < w; i++)
+	{
+		cin >> y >> x;
+		//(y, x)
+		points.push_back(Point(x, y));
+	}
+
+	cout << dp_buttom_up(0, 0) << '\n';
+	back_tracking(0, 0);
+
+	//index_result 리버스로
+
 }
-//4%
