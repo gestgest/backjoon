@@ -1,18 +1,56 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include <math.h>
+
+#define INF 2147483647
 
 using namespace std;
 
-int min(int a, int b)
+int n;
+int k;
+
+//div 4
+//1 2 3 
+//2 4 6     => 안되는 숫자 = min((div / (i + 1)), n)
+//3 6 9
+
+//4, 6등
+//6, 8등
+
+
+//div = 4, sum = 4. 순위는  (n * n + 1 - sum) => 6. 4 / 6
+// div = 5, sum = 3
+//div = 6, sum = 3 순위는 3. 순위는 7. => 7, 최대한 오른쪽으로
+long long cal_rank(int div)
 {
-	if (a < b) {
-		return a;
+	long long sum = 0; //div 앞에 있는 숫자 => 
+	for (int i = 1; i <= n; i++)
+	{
+		sum += min(div / i, n);
+	}
+
+	return sum;
+}
+
+
+//이분탐색
+int binary_search_div(int start, int end)
+{
+	if (start > end)
+	{
+		return start;
+	}
+
+	int mid = (start + end) / 2;
+	long long rank = cal_rank(mid);
+
+	if (rank >= k) {
+		return binary_search_div(start, mid - 1);
 	}
 	else {
-		return b;
+		return binary_search_div(mid + 1, end);
 	}
+	
 }
 
 int main()
@@ -20,46 +58,16 @@ int main()
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
-	int n, k;
 	cin >> n >> k;
-	int  start = 1, end = k;
-	int result = k;
 
-	while (start <= end)
-	{
-		int mid = (start + end) / 2;
-		int sum = 0;
-		for (int i = 1; i <= n; i++)
-		{
-			sum += min(mid / i, n);
+	cout << binary_search_div(1, k) << '\n';
 
-			if (mid < i) {
-				break;
-			}
-		}
-		if (sum < k) //-> 
-		{
-			start = mid + 1;
-		}
-		else if(k <= sum) {
-			end = mid - 1;
-			result = min(result, mid);
-		}
-	}
-
-	cout << result << '\n';
 
 	/*
-	vector<int> v;
-	for (int i = 1; i <= n; i++)
-	{
-		for (int j = 1; j <= n; j++)
-		{
-			v.push_back(i * j);
-		}
-	}
-	sort(v.begin(), v.end());
-
-	cout << v[k - 1] << '\n';
+	1 2 3
+	2 4 6
+	3 6 9
 	*/
+
+
 }
