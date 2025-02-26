@@ -1,85 +1,67 @@
 #include <iostream>
+#include <stack>
 #include <vector>
 #include <algorithm>
+
+#define INF 2147483647
 
 using namespace std;
 
 int dp[1001][1001] = { 0 };
 
-int max_value(int a, int b)
-{
-	if (a < b) {
-		return b;
-	}
-	return a;
-}
 
+
+//dp 역추적
 int main()
 {
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
 	string s[2];
+	int i, j;
 
-	//0은 가로, 1은 세로
+	//1차 인풋 가로 1001
+	//2차 인풋 세로 1001
 	cin >> s[0] >> s[1];
 
-	for (int i = 1; i <= s[1].size(); i++)
+	for (i = 1; i <= s[1].size(); i++)
 	{
-		for (int j = 1; j <= s[0].size(); j++)
+		for (j = 1; j <= s[0].size(); j++)
 		{
-			dp[i][j] = max_value(dp[i][j - 1], dp[i - 1][j]);
+			dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+			if (s[0][j - 1] == s[1][i - 1])
+				dp[i][j] = max(dp[i][j], dp[i - 1][j - 1] + 1);
 
-			if (s[1][i - 1] == s[0][j - 1])
-			{
-				dp[i][j] = max_value(dp[i][j], dp[i - 1][j - 1] + 1);
-			}
 		}
 	}
-	cout << dp[s[1].size()][s[0].size()] << '\n';
+	j = s[0].size();
+	i = s[1].size();
 
-	int y = s[1].size();
-	int x = s[0].size();
-	string v = "";
-	
-	//디버깅
-	/*
-	for (int i = 0; i <= y; i++)
-	{
-		for (int j = 0; j <= x; j++)
-		{
-			cout << dp[i][j] << ' ';
-		}
-		cout << '\n';
-	}
-	*/
-
-	//역추적 <- 위
+	cout << dp[i][j] << '\n';
+	stack<char> char_stack;
 	while (true)
 	{
-		if (y == 0 || x == 0)
+		if (dp[i][j] == 0)
 			break;
-
-		//왼쪽으로 쭉
-		if (dp[y][x] == dp[y][x - 1])
+		while (true)
 		{
-			x--;
+			if (dp[i - 1][j] != dp[i][j])
+				break;
+			i--;
 		}
-		//위쪽으로 쭉
-		else if (dp[y][x] == dp[y - 1][x])
+		while (true)
 		{
-			y--;
+			if (dp[i][j - 1] != dp[i][j])
+				break;
+			j--;
 		}
-		else {
-			x--;
-			y--;
-			v += s[0][x];
-		}
+		char_stack.push(s[0][j - 1]);
+		i--; j--;
 	}
-
-	for (int i = v.length() - 1; i >= 0; i--)
+	while (!char_stack.empty())
 	{
-		cout << v[i];
+		char c = char_stack.top();
+		cout << c;
+		char_stack.pop();
 	}
-
 }
