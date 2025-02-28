@@ -4,80 +4,61 @@
 
 using namespace std;
 
-int node[1000001];
+int union_array [1000001];
 
-int min_value(int a, int b)
+int find_union(int i)
 {
-	return a < b ? a : b;
+	if (i == union_array[i]) return i;
+	return union_array[i] = find_union(union_array[i]);
 }
 
-int union_search(int num)
+void add_array(int a, int b)
 {
-	if (num == node[num]) return num;
-	return node[num] = union_search(node[num]);
+	a = find_union(a);
+	b = find_union(b);
+
+	if (a < b) {
+		union_array[b] = a;
+	}
+	else {
+		union_array[a] = b;
+	}
 }
 
-void add_union(int a, int b)
-{
-	a = union_search(a);
-	b = union_search(b);
-
-	int num = min_value(a, b);
-	node[a] = num;
-	node[b] = num;
-
-}
-
-bool isUnion(int a, int b) 
-{
-	a = union_search(a);
-	b = union_search(b);
-	if (a == b)
-		return true;
-	else
-		return false;
-}
 
 int main()
 {
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
-	//백만개
-	int n, t;
-	int a, b, c;
+	//10 6따리, 10 5따리
+	int n, m, flag;
+	int a, b;
+	cin >> n >> m;
 
-	cin >> n >> t;
-
-	//배열 초기화
 	for (int i = 0; i <= n; i++)
 	{
-		node[i] = i;
+		union_array[i] = i;
 	}
 
-	for (int i = 0; i < t; i++)
+	//유니온?
+	for (int i = 0; i < m; i++)
 	{
-		cin >> a >> b >> c; //b-1 c-1
-		switch (a) {
-		case 0:
-			add_union(b, c);
-			break;
-		case 1:
-			if (isUnion(b, c)){
-				cout << "YES\n";
+		cin >> flag;
+		cin >> a >> b;
+
+		if (flag == 0) {
+			add_array(a, b);
+		}
+		else {
+			if (find_union(a) == find_union(b))
+			{
+				cout << "YES" << '\n';
 			}
 			else {
-				cout << "NO\n";
+				cout << "NO" << '\n';
 			}
-			break;
 		}
 	}
-
-	/* 디버깅
-	for (int i = 0; i < n; i++)
-	{
-		cout << node[i] << ' ';
-	}
-	cout << '\n';
-	*/
+	
 }
