@@ -4,14 +4,16 @@
 
 using namespace std;
 
-int binary_index_search(vector<int> &s,int num)
+vector<int> v;
+
+int binary_search_v(int start, int end, int num)
 {
-	int start = 0, end = s.size() - 1;
 	while (start <= end)
 	{
 		int mid = (start + end) / 2;
 
-		if (s[mid] < num) {
+		if (num > v[mid])
+		{
 			start = mid + 1;
 		}
 		else {
@@ -21,32 +23,36 @@ int binary_index_search(vector<int> &s,int num)
 	return start;
 }
 
+void addDP(int num)
+{
+	//이분탐색
+	if (v.size() == 0)
+	{
+		v.push_back(num);
+		return;
+	}
+	if (v[v.size() - 1] < num)
+	{
+		v.push_back(num);
+		return;
+	}
+	v[binary_search_v(0, v.size() - 1, num)] = num;
+}
+
+
+//dp
 int main()
 {
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
-	vector<int> s;
-
-	int n;
-	int number;
+	int n, num;
 	cin >> n;
-
-	while(n--)
+	for (int i = 0; i < n; i++)
 	{
-		cin >> number;
-		int len = s.size();
-		if(len == 0)
-			s.push_back(number);
-		//LIS 알고리즘
-		else if (s[len - 1] < number) {
-			s.push_back(number);
-		}
-		// 이분탐색을 이용한 LIS 알고리즘
-		else {
-			s[binary_index_search(s, number)] = number;
-		}
+		cin >> num;
+		addDP(num);
 	}
-	cout << s.size() << '\n';
-
+	cout << v.size() << '\n';
+	
 }
