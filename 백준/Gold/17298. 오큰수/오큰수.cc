@@ -1,51 +1,63 @@
 #include <iostream>
+#include <vector>
 #include <stack>
 #include <algorithm>
 
+#define INF 2147483647
+
 using namespace std;
 
-int s[1000000];
+class Ans {
+public:
+	int index;
+	int number;
+
+	Ans(int index, int number)
+	{
+		this->index = index;
+		this->number = number;
+	}
+};
+
 int main()
 {
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
-	stack<int> my_stack;
+	//스택?
+	//스택이 쌓인다면 무조건 내림차순으로 떨어진다
+
 	int n, num;
 	cin >> n;
+	vector<int> v = vector<int>(n, -1);
+	stack<Ans> my_stack;
+
 
 	for (int i = 0; i < n; i++)
 	{
 		cin >> num;
-		s[i] = num;
 
-		//스택 탐색
-		while (!(my_stack.empty()))
+		//100만
+		while (!my_stack.empty())
 		{
-			int index = my_stack.top();
-			if (s[index] < num)
+			Ans ans = my_stack.top();
+
+			if (ans.number < num)
 			{
-				s[index] = num;
+				v[ans.index] = num;
 				my_stack.pop();
 			}
-			else {
+			else 
+			{
 				break;
 			}
 		}
-		my_stack.push(i);
+
+		my_stack.push(Ans(i, num));
 	}
 
-	//스택 탐색
-	while (!(my_stack.empty()))
-	{
-		int index = my_stack.top();
-		s[index] = -1;
-		my_stack.pop();
-	}
 	for (int i = 0; i < n; i++)
 	{
-		cout << s[i] << ' ';
+		cout << v[i] << ' ';
 	}
-
-
 }
