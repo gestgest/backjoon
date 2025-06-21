@@ -1,44 +1,46 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
-
-#define INF 2147483647
+#include <algorithm>
 
 using namespace std;
+#define INF 2147483647
 
-void bf(int weight[], vector<int>& sum, int start, const int end, int value, const int max_weight)
+int n;
+int max_weight;
+
+int binary_search_weight(vector<int> & tmp, int start, int end, int value)
 {
-	if (value > max_weight || start > end) {
-		return;
-	}
-	if (start == end) {
-		sum.push_back(value);
-		return;
-	}
-
-	bf(weight, sum, start + 1, end, value + weight[start], max_weight); //O
-	bf(weight, sum, start + 1, end, value, max_weight); //X
-}
-
-int binary_search_weight(vector<int>& sum, int start, int end, int value)
-{
-	if (start > end) 
+	//값이 같으면 end가 내려가야함
+	if (start > end)
 	{
 		return start;
-		// 1 2 3 4 (10) 15 => 여기서 4의 index 3을 원하면 return end;
-		// ㄴ 15의 index 4를 원하면 return start;
-		// 0 1 1 1 1 4 => 
 	}
+
 	int mid = (start + end) / 2;
 
-	//<-
-	if (value < sum[mid]) {
-		return binary_search_weight(sum, start, mid - 1, value);
+	if (value >= tmp[mid])
+	{
+		return binary_search_weight(tmp, mid + 1, end, value);
 	}
-	//같아도 ->,  start 
-	else { 
-		return binary_search_weight(sum, mid + 1, end, value);
+	else {
+		return binary_search_weight(tmp, start, mid -1, value);
 	}
+}
+
+void myBruthforce(vector<int> & input, vector<int>& output, int sum, int index, int max_index)
+{
+	if (sum > max_weight)
+	{
+		return;
+	}
+	if (index == max_index)
+	{
+		output.push_back(sum);
+		return;
+	}
+
+	myBruthforce(input, output, sum + input[index], index + 1, max_index);
+	myBruthforce(input, output, sum, index + 1, max_index);
 }
 
 int main()
@@ -46,31 +48,30 @@ int main()
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
-	int n, max_weight;
-	int weight[30];
-	int count = 0;
+	int sum = 0;
 
-	vector<int> sum[2];
-
-	//n은 30까지
-	cin >> n >> max_weight;
-
+	cin >> n >>  max_weight;
+	vector<int> input = vector<int>(n);
+	vector<int> output[2];
 	for (int i = 0; i < n; i++)
 	{
-		cin >> weight[i];
+		cin >> input[i];
 	}
-	
-	bf(weight, sum[0], 0, n / 2, 0, max_weight);
-	bf(weight, sum[1], n / 2, n, 0, max_weight);
 
-	sort(sum[1].begin(), sum[1].end()); //이분탐색을 위한 정렬
+	myBruthforce(input, output[0], sum, 0, n / 2);
+	myBruthforce(input, output[1], sum, n / 2, n);
 
-	for (int i = 0; i < sum[0].size(); i++)
+	sort(output[0].begin(), output[0].end());
+
+	for (int i = 0; i < output[1].size(); i++)
 	{
-		int a = sum[0][i];
-		int b = binary_search_weight(sum[1], 0, sum[1].size() - 1, max_weight - a);
-		count += b;
+		int value = max_weight - output[1][i];
+		int count = binary_search_weight(output[0], 0, output[0].size() - 1, value);
+		sum += count;
 	}
 
-	cout << count << '\n';
+	cout << sum << '\n';
+
+	//절반은 정렬, 절반은 bf 2^15
+	//
 }
