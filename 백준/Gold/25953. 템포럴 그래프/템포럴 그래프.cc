@@ -3,13 +3,18 @@
 #include <algorithm>
 
 using namespace std;
-#define INF 2000000000
+#define INF 2147483647
 
 //t(before, current) * n
-long long dp[2][10000];
+int dp[2][10000];
 
+//틀리면 덮어쓰기 잘못, 맞으면 전에 참조 알고리즘이 잘못?
 void add_edge(int t, int a, int b, int c)
 {
+    
+	//아래로 쭉
+	if (dp[(t + 1) % 2][b] > dp[t % 2][b])
+		dp[(t + 1) % 2][b] = dp[t % 2][b];
 	//start -> a가 없음
 	if (dp[t % 2][a] == INF)
 	{
@@ -52,7 +57,7 @@ int main()
 
 	for (int i = 0; i < t; i++)
 	{
-
+		//핵심포인트
 		for (int j = 0; j < n; j++)
 		{
 			dp[(i + 1) % 2][j] = dp[i % 2][j];
