@@ -6,7 +6,24 @@ using namespace std;
 #define INF 2000000000
 
 //t(before, current) * n
-int dp[1001][10000];
+long long dp[2][10000];
+
+void add_edge(int t, int a, int b, int c)
+{
+	//start -> a가 없음
+	if (dp[t % 2][a] == INF)
+	{
+		return;
+	}
+
+	//a -> b , if (start -> a + c < start -> b)
+	if (dp[t % 2][a] + c < dp[(t + 1) % 2][b])
+	{
+		dp[(t + 1) % 2][b] = dp[t % 2][a] + c;
+	}
+	else {
+	}
+}
 
 int main()
 {
@@ -17,37 +34,41 @@ int main()
 	int n, t, edge_count;
 	int start, end;
 	int a, b, c;
-	
+
 	//3차원 배열도 힘든데?
 	cin >> n >> t >> edge_count;
 	cin >> start >> end;
 
-	for (int j = 0; j < n; j++)
+	for (int i = 0; i < 2; i++)
 	{
-		dp[0][j] = INF;
+		for (int j = 0; j < n; j++)
+		{
+			dp[i][j] = INF;
+		}
+		dp[i][start] = 0;
 	}
-	dp[0][start] = 0;
 
 	//하나는 T로 두고 하나는
 
 	for (int i = 0; i < t; i++)
 	{
+
 		for (int j = 0; j < n; j++)
 		{
-			dp[i + 1][j] = dp[i][j];
+			dp[(i + 1) % 2][j] = dp[i % 2][j];
 		}
 
 		for (int j = 0; j < edge_count; j++)
 		{
 			cin >> a >> b >> c;
-			dp[i + 1][b] = min(dp[i + 1][b], dp[i][a] + c);
-			dp[i + 1][a] = min(dp[i + 1][a], dp[i][b] + c);
+			add_edge(i, a, b, c);
+			add_edge(i, b, a, c);
 		}
 	}
 
 
 	//t가 짝수면 홀수번째
-	if (dp[t][end] == INF)
-		dp[t][end] = -1;
-	cout << dp[t][end] << '\n';
+	if (dp[t % 2][end] == INF)
+		dp[t % 2][end] = -1;
+	cout << dp[t % 2][end] << '\n';
 }
