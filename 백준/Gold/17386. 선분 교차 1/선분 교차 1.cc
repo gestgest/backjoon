@@ -3,84 +3,89 @@
 #include <algorithm>
 
 using namespace std;
+#define INF 2147483647
 
 class Point {
 public:
 	long long x;
 	long long y;
-	void InputPoint()
+	Point()
 	{
-		cin >> x >> y;
+
 	}
-
-	int ccw(Point & point) 
+	Point(long long x, long long y)
 	{
-		long long num = (this->y * point.x) - (this->x * point.y);
-
-		if (num < 0) {
-			return -1;
-		}
-		else if (num == 0) {
+		this->x = x;
+		this->y = y;
+	}
+	Point operator - (Point &point)
+	{
+		Point p(this->x - point.x, this->y - point.y);
+		return p;
+	}
+	//음수면 
+	int productDot(Point& point)
+	{
+		//대충 음수면 
+		long long result = this->x * point.y - this->y * point.x;
+		if (result == 0)
+		{
 			return 0;
 		}
-		return 1;
-	}
-
-	Point operator-(Point &point){
-		Point result;
-		result.x = this->x - point.x;
-		result.y = this->y - point.y;
-		return result;
+		else if (result > 0)
+		{
+			return 1;
+		}
+		else {
+			return -1;
+		}
+		
 	}
 };
-
-bool isCheck(Point *edges)
-{
-	//양수 * 양수 또는 음수 * 음수 => 교차하는 선이 없음
-	if (edges[0].ccw(edges[1]) * edges[0].ccw(edges[2]) > 0)
-		return false;
-	if (edges[3].ccw(edges[4]) * edges[3].ccw(edges[5]) > 0)
-		return false;
-	return true;
-}
 
 int main()
 {
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
+	vector<Point> inputs;
+	vector<Point> edges;
 
-	Point p[2][2];
-
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 4; i++)
 	{
-		for (int j = 0; j < 2; j++)
-		{
-			p[i][j].InputPoint();
-		}
+		long long x, y;
+		cin >> x >> y;
+
+		inputs.push_back(Point(x, y));
+
 	}
 
-	Point edges[6];
-	edges[0] = p[0][0] - p[0][1]; //BA
-	edges[1] = p[1][0] - p[0][1]; //BC
-	edges[2] = p[1][1] - p[0][1]; //BD
+	edges.push_back(Point(inputs[1] - inputs[0]));
+	edges.push_back(Point(inputs[2] - inputs[1]));
+	edges.push_back(Point(inputs[3] - inputs[1]));
 
-	edges[3] = p[1][0] - p[1][1]; //DC
-	edges[4] = p[0][0] - p[1][1]; //DA
-	edges[5] = p[0][1] - p[1][1]; //DB
+	edges.push_back(Point(inputs[3] - inputs[2]));
+	edges.push_back(Point(inputs[0] - inputs[3]));
+	edges.push_back(Point(inputs[1] - inputs[3]));
 
-	//기울기 
-	//만약 교차한다면 abc abd는 둘개중 무조건 하나는 양수, 음수가 된다
-	//c는 무조건 위, d는 무조건 아래 => 외적이 무조건 갈릴 수 밖에 없다 => 시계방향, 반시계 방향
+	int num1 = edges[0].productDot(edges[1]) * edges[0].productDot(edges[2]);
+	int num2 = edges[3].productDot(edges[4]) * edges[3].productDot(edges[5]);
 
-	if (isCheck(edges)) {
-		cout << 1 << '\n';
-	}
-	else {
+	//음수 양수 => 시계 반시계
+	if (num1 > 0 || num2 > 0)
+	{
 		cout << 0 << '\n';
 	}
+	//둘다 -1
+	else {
+		cout << 1 << '\n';
+	}
 
-	//A - B - C : 시계
-	//A - B - D : 시계
-	// => 이거 부터가 둘다 같은 타입이라 합치지 않음
+	
+	//v[0] -> v[1] 
+	//v[1] -> v[2] 
+	//v[1] -> v[3] 
 
+	//v[2] -> v[3] 
+	//v[3] -> v[0] 
+	//v[3] -> v[1] 
 }
