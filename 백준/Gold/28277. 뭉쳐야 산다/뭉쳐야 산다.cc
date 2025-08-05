@@ -18,9 +18,15 @@ void union_add(int a, int b)
 	//최대 50만 * 25만번 => 12.5 * 10^10 => 1250 0000 0000 => ??? 시간초과 안 나려나?
 	if (numbers[a].size() <= numbers[b].size()) swap(numbers[a], numbers[b]);
 
-	for (int num : numbers[b])
-		numbers[a].insert(num);
+	//왜 아래건 오래 걸리지
+	for (set<int>::iterator it = numbers[b].begin(); it != numbers[b].end(); it++)
+	{
+		numbers[a].insert(*it);
+	}
+	
 
+	/*for (int num : numbers[b])
+		numbers[a].insert(num);*/
 
 	numbers[b].clear();
 }
