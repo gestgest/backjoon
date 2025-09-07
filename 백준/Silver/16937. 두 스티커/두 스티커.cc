@@ -4,79 +4,80 @@
 
 using namespace std;
 
-class Point {
-public:
-	int pos[2];
-	Point(int x, int y) {
-		this->pos[0] = x;
-		this->pos[1] = y;
-	}
-	int getArea(Point point)
-	{
-		return pos[0] * pos[1] + point.pos[0] * point.pos[1];
-	}
+#define INF 2147483647
 
-	int areaCal(Point& range, Point& point) {
-		for (int i = 0; i < 2; i++)
+class Stiker
+{
+public:
+	int w[2];
+	int operator*(Stiker &stiker)
+	{
+		return this->w[0] * this->w[1] + stiker.w[0] * stiker.w[1];
+	}
+};
+
+bool isCheck(Stiker &area, Stiker &a, Stiker&b)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		for (int j = 0; j < 2; j++)
 		{
-			for (int j = 0; j < 2; j++)
+			//area
+			for (int k = 0; k < 2; k++)
 			{
-				for (int k = 0; k < 2; k++)
+				//10 1 < 5 1 6 1
+				if (area.w[k] < a.w[i] + b.w[j])
 				{
-					//아니라면
-					//range.x >= x + point.x && range.
-					if (range.pos[k] < point.pos[i] + pos[j])
-					{
-						continue;
-					}
-					//또 다른 포지션이 범주안에 있다면
-					if (range.pos[(k + 1) % 2] >= point.pos[(i + 1) % 2] && range.pos[(k + 1) % 2] >= pos[(j + 1) % 2])
-					{
-						return getArea(point);
-					}
-					
+					continue;
+				}
+
+				if (area.w[(k + 1) % 2] >= a.w[(i + 1) % 2] && area.w[(k + 1) % 2] >= b.w[(j + 1) % 2])
+				{
+					return true;
 				}
 			}
 		}
-		return 0;
 	}
-};
+	return false;
+}
+
 
 int main()
 {
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
+
+	Stiker paper;
 	int n;
-	int width, height;
-	int x, y;
-	int max_value = 0;
+	int a, b;
+	int sum_w, sum_h;
+	cin >> paper.w[0] >> paper.w[1] >> n;
+	int area = 0;
 
-	cin >> width >> height;
-	Point range(width, height);
-	cin >> n;
+	vector<Stiker> v = vector<Stiker>(n);
 
-	vector<Point> points;
 	for (int i = 0; i < n; i++)
 	{
-		cin >> x >> y;
-		points.push_back(Point(x, y));
+		cin >> v[i].w[0] >> v[i].w[1];
 	}
-
-	for (int i = 0; i < n; i++)
+	//O(n^2)
+	for (int i = 0; i < v.size(); i++)
 	{
-		for (int j = i + 1; j < n; j++)
+		for (int j = i + 1; j < v.size(); j++)
 		{
-			int num = points[i].areaCal(range, points[j]);
-			if (max_value < num) 
+			if (!isCheck(paper, v[i], v[j]))
 			{
-				max_value = num;
+				continue;
 			}
 
+			int num = v[i] * v[j];
+			if (area < num)
+			{
+				area = num;
+			}
 		}
 	}
 
-	cout << max_value << '\n';
-	
-
+	cout << area << '\n';
 }
