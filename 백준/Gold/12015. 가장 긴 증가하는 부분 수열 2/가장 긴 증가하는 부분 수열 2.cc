@@ -1,18 +1,20 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
 using namespace std;
 
+#define INF 2147483647
+
 vector<int> v;
 
-int binary_search_v(int start, int end, int num)
+int binary_search_index(int start, int end, int value)
 {
+	int mid;
 	while (start <= end)
 	{
-		int mid = (start + end) / 2;
+		mid = (start + end) / 2;
 
-		if (num > v[mid])
+		if (v[mid] < value)
 		{
 			start = mid + 1;
 		}
@@ -21,26 +23,9 @@ int binary_search_v(int start, int end, int num)
 		}
 	}
 	return start;
+
 }
 
-void addDP(int num)
-{
-	//이분탐색
-	if (v.size() == 0)
-	{
-		v.push_back(num);
-		return;
-	}
-	if (v[v.size() - 1] < num)
-	{
-		v.push_back(num);
-		return;
-	}
-	v[binary_search_v(0, v.size() - 1, num)] = num;
-}
-
-
-//dp
 int main()
 {
 	cin.tie(NULL);
@@ -48,11 +33,23 @@ int main()
 
 	int n, num;
 	cin >> n;
+
 	for (int i = 0; i < n; i++)
 	{
 		cin >> num;
-		addDP(num);
+		if (v.size() == 0)
+		{
+			v.push_back(num);
+		}
+		else if (v[v.size() - 1] < num)
+		{
+			v.push_back(num);
+		}
+		int index = binary_search_index(0, v.size() - 1, num);
+
+		v[index] = num;
 	}
+
 	cout << v.size() << '\n';
-	
+
 }
