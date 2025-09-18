@@ -1,104 +1,131 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
+#include <cmath>
 
 using namespace std;
+
+#define INF 2147483647
 
 class Point {
 public:
 	int x;
 	int y;
-	Point(int x, int y) {
+
+	Point(int x, int y)
+	{
 		this->x = x;
 		this->y = y;
 	}
+	//point => before
+	int cal_dis(Point& point)
+	{
+		return abs(this->x - point.x) + abs(this->y - point.y);
+	}
 };
 
-//dp는 [경찰차1_k_index][경찰차2_k_index]
+
+vector<Point> input;
 int dp[1001][1001];
+int n, e;
 
-int n, w;
-vector<Point> points;
-vector<int> index_result;
-
-int cal_dis(int old_x, int old_y, int new_x, int new_y)
+int search_dp(int index1, int index2)
 {
-	int x = abs(new_x - old_x);
-	int y = abs(new_y - old_y);
-	return x + y;
-}
-
-int dp_buttom_up(int index1, int index2)
-{
-	//다 했다면
-	if (index1 == w || index2 == w)
+	//끝까지 간다면
+	if (index1 == e || index2 == e)
 	{
 		return 0;
 	}
 
-	if (dp[index1][index2] != -1)
+	//만약 dp[5][3]이면 1번 경찰차는 5번째 2번 경찰차는 3번째에 있으니 그 아래부턴 중첩된다
+	if (dp[index1][index2] != INF)
+	{
 		return dp[index1][index2];
-
-	dp[index1][index2] = 0;
-
-	int next = max(index1, index2) + 1; //다음 사건
-	int dis[2];
-
-	if (index1 == 0) { //(1,1)
-		dis[0] = cal_dis(1, 1, points[next].x, points[next].y);
+	}
+	int a, b, c;
+	if (index1 < index2)
+	{
+		c = index2;
 	}
 	else {
-		dis[0] = cal_dis(points[index1].x, points[index1].y, points[next].x, points[next].y);
+		c = index1;
 	}
 
-	if (index2 == 0) { //(n,n)
-		dis[1] = cal_dis(n, n, points[next].x, points[next].y);
+	//index1++
+	//경찰차1이 처음으로 움직인 경우
+	if (index1 == 0)
+	{
+		Point left_point(0, 0);
+		//인풋때문에 이렇게 if문으로 나눔
+		a = search_dp(c + 1, index2) + input[c].cal_dis(left_point);
 	}
-	else {
-		dis[1] = cal_dis(points[index2].x, points[index2].y, points[next].x, points[next].y);
+	else 
+	{
+		a = search_dp(c + 1, index2) + input[c].cal_dis(input[index1 - 1]);
 	}
 
-	//min
-	dp[index1][index2] = min(dp_buttom_up(next, index2) + dis[0], dp_buttom_up(index1, next) + dis[1]);
-	return dp[index1][index2];
+	// index2++
+	if (index2 == 0)
+	{
+		Point right_point(n - 1, n - 1);
+		b = search_dp(index1, c + 1) + input[c].cal_dis(right_point);
+	}
+	else
+	{
+		b = search_dp(index1, c + 1) + input[c].cal_dis(input[index2 - 1]);
+	}
+
+	return dp[index1][index2] = min(a, b);
 }
 
-
-//역추적
-void back_tracking(int index1, int index2)
+void reverse_dp(int index1, int index2)
 {
-
-	//다 했다면
-	if (index1 == w || index2 == w)
+	//끝까지 간다면
+	if (index1 == e || index2 == e)
 	{
 		return;
 	}
+	int a, b, c;
 
-	int next = max(index1, index2) + 1; //다음 사건
-	int dis[2];
-
-	if (index1 == 0) { //(1,1)
-		dis[0] = cal_dis(1, 1, points[next].x, points[next].y);
+	if (index1 < index2)
+	{
+		c = index2;
 	}
 	else {
-		dis[0] = cal_dis(points[index1].x, points[index1].y, points[next].x, points[next].y);
+		c = index1;
 	}
 
-	if (index2 == 0) { //(n,n)
-		dis[1] = cal_dis(n, n, points[next].x, points[next].y);
+	//index1++
+	//경찰차1이 처음으로 움직인 경우
+	if (index1 == 0)
+	{
+		Point left_point(0, 0);
+		//인풋때문에 이렇게 if문으로 나눔
+		a = dp[c + 1][index2] + input[c].cal_dis(left_point);
 	}
-	else {
-		dis[1] = cal_dis(points[index2].x, points[index2].y, points[next].x, points[next].y);
+	else
+	{
+		a = dp[c + 1][index2] + input[c].cal_dis(input[index1 - 1]);
 	}
-	
-	if (dp[next][index2] + dis[0] < dp[index1][next] + dis[1])
+
+	// index2++
+	if (index2 == 0)
+	{
+		Point right_point(n - 1, n - 1);
+		b = dp[index1][c + 1] + input[c].cal_dis(right_point);
+	}
+	else
+	{
+		b = dp[index1][c + 1] + input[c].cal_dis(input[index2 - 1]);
+	}
+
+	if (a < b)
 	{
 		cout << 1 << '\n';
-		back_tracking(next, index2);
+		reverse_dp(c + 1, index2);
 	}
 	else {
 		cout << 2 << '\n';
-		back_tracking(index1, next);
+		reverse_dp(index1, c + 1);
 	}
 }
 
@@ -107,30 +134,27 @@ int main()
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
-	//경찰차 하나는 (1,1) 하나는 (n,n)
-	int y, x;
-	cin >> n >> w;
+	int x,y;
+	cin >> n;
+	cin >> e;
 
-	//나중에 -1, 0으로 들어갔는지 아닌지 확인용도
-	for (int i = 0; i < w; i++)
+	for (int i = 0; i < e; i++)
 	{
-		for (int j = 0; j < w; j++)
+		cin >> x >> y;
+
+		x--; y--;
+		input.push_back(Point(y,x));
+		for (int j = 0; j < e; j++)
 		{
-			dp[i][j] = -1;
+			dp[i][j] = INF;
 		}
 	}
 
-	points.push_back(Point(0, 0)); //간편한 계산을 위해 [0]은 쓰레기값
-	for (int i = 0; i < w; i++)
-	{
-		cin >> y >> x;
-		//(y, x)
-		points.push_back(Point(x, y));
-	}
+	cout << search_dp(0, 0) << '\n';
 
-	cout << dp_buttom_up(0, 0) << '\n';
-	back_tracking(0, 0);
-
-	//index_result 리버스로
-
+	//역추적
+	reverse_dp(0, 0);
+	
 }
+
+//2,3
