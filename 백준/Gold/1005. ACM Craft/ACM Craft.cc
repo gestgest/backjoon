@@ -1,93 +1,105 @@
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <queue>
 
 using namespace std;
+
 #define INF 2147483647
 
-
-int waste_times[1000];
-int results[1000];
-vector<int> graph[1000];
-int indegrees[1000];
-
-
-void bfs(int n)
-{
-	queue<int> my_queue; //index
-
-	for (int i = 0; i < n; i++)
+class Edge {
+public:
+	int src;
+	int dst;
+	Edge(int src, int dst)
 	{
-		//시작노드가 부모 => indegree가 0
-		if (indegrees[i] == 0)
+		this->src = src;
+		this->dst = dst;
+	}
+};
+
+int bfs(vector<vector<int>> & graph, vector<int> &building, vector<int> &count, int find_index)
+{
+	vector<int> v = vector<int>(count.size(), 0);
+	queue<Edge> q;
+	//전출차수 0인 노드 찾기
+	for (int i = 0; i < count.size(); i++)
+	{
+		if (count[i] == 0)
 		{
-			my_queue.push(i);
+			q.push(Edge(i, i));
 		}
 	}
 
-	while (!my_queue.empty())
+	//
+	while (!q.empty())
 	{
-		//start
-		int start = my_queue.front();
-		my_queue.pop();
+		Edge edge = q.front();
+		q.pop();
 
-		for (int i = 0; i < graph[start].size(); i++)
+		//진행 값 넣기
+		count[edge.dst]--;
+		
+		//제일 큰 값 업그레이드
+		if (v[edge.dst] < v[edge.src])
 		{
-			int end = graph[start][i];
+			v[edge.dst] = v[edge.src];
+		}
 
-			results[end] = max(results[end], results[start] + waste_times[end]);
-			indegrees[end]--;
+		//-1도 방지, 다 도착했을 경우
+		if (count[edge.dst] <= 0)
+		{
+			v[edge.dst] += building[edge.dst];
 
-			if (indegrees[end] == 0)
+			//그래프 탐색
+			for (int i = 0; i < graph[edge.dst].size(); i++)
 			{
-				my_queue.push(end);
+				q.push(Edge(edge.dst, graph[edge.dst][i]));
 			}
 		}
 	}
+
+	return v[find_index];
 }
 
-//다익으로 해서 제일 큰 값이
+//위상정렬
 int main()
 {
 	cin.tie(NULL);
 	ios_base::sync_with_stdio(false);
 
-	int i, j;
-	int n, t, k;
+	int t;
+	int n, k;
 	int a, b;
-	int win_building_index;
 	cin >> t;
 
 	while (t--)
 	{
 		cin >> n >> k;
 
-		int max_value = 0;
+		vector<int> building = vector<int>(n);
+		vector<int> count = vector<int>(n, 0);
+		vector<vector<int>> graph = vector<vector<int>>(n);
+		int find_index;
 
-		for (i = 0; i < n; i++)
+		//건물 짓는 시간
+		for (int i = 0; i < n; i++)
 		{
-			cin >> waste_times[i];
-			graph[i].clear();
-			indegrees[i] = 0;
-			results[i] = waste_times[i];
+			cin >> building[i];
 		}
 
-		for (i = 0; i < k; i++)
+		//a -> b, 전입이 a, 전출이 b
+		for (int i = 0; i < k; i++)
 		{
 			cin >> a >> b;
 			a--; b--;
 
 			graph[a].push_back(b);
-			indegrees[b]++;
+			count[b]++;
 		}
 
+		cin >> find_index;
+		find_index--;
 
-		cin >> win_building_index;
-		win_building_index--;
-
-		bfs(n);
-
-		cout << results[win_building_index] << '\n';
+		cout << bfs(graph, building, count, find_index) << '\n';
 	}
 }
